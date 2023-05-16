@@ -14,11 +14,19 @@ const items = [
     {
         label: 'LayerZero',
         key: 'layer',
+    },
+    {
+        label: 'Mirror',
+        key: 'mirror',
+    },
+    {
+        label: 'Coffee',
+        key: 'coffee',
     }
 ];
 const MenuHeader = () => {
     const navigate = useNavigate();
-    const [current, setCurrent] = useState('mail');
+    const [current, setCurrent] = useState();
     const onClick = (e) => {
         console.log('click ', e);
         setCurrent(e.key);
@@ -33,6 +41,10 @@ const MenuHeader = () => {
             setCurrent('stark')
         } else if (location.pathname === '/layer') {
             setCurrent('layer')
+        } else if (location.pathname === '/mirror') {
+            setCurrent('mirror')
+        } else if (location.pathname === '/coffee') {
+            setCurrent('coffee')
         }
     }, [location.pathname]);
     useEffect(() => {
@@ -45,7 +57,30 @@ const MenuHeader = () => {
         if (current === 'layer') {
             navigate('/layer');
         }
+        if (current === 'mirror') {
+            navigate('/mirror');
+        }
+        if (current === 'coffee') {
+            navigate('/coffee');
+        }
     }, [current]);
-    return <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items}/>;
+    return (
+        <Menu
+            onClick={onClick}
+            selectedKeys={[current]}
+            mode="horizontal"
+            style={{
+                display: 'flex',
+                justifyContent: 'center'
+            }}
+        >
+            {items.map(item =>
+                <Menu.Item key={item.key}>
+                    {item.label}
+                </Menu.Item>
+            )}
+        </Menu>
+    );
+
 };
 export default MenuHeader;

@@ -1,14 +1,14 @@
-import getEthBalance from "./getEthBalance.js";
-import getTxCount from "./getTxCount.js";
-import getZksEra from "./getZksEra.js";
-import getZksLite from "./getZksLite.js";
-import getZkSyncBridge from "./getZkSyncBridge.js";
-import getZkSyncLastTX from "./getZkSyncLastTX.js";
-import exportToExcel from "./save_excel.js";
+import getEthBalance from "./zksync/getEthBalance.js";
+import getTxCount from "./zksync/getTxCount.js";
+import getZksEra from "./zksync/getZksEra.js";
+import getZksLite from "./zksync/getZksLite.js";
+import getZkSyncBridge from "./zksync/getZkSyncBridge.js";
+import getZkSyncLastTX from "./zksync/getZkSyncLastTX.js";
+import exportToExcel from "./save_excel/save_excel.js";
 import getStarkTx from "@utils/stark/getStarkTx.js";
 import getStarkBridge from "@utils/stark/getStarkBridge.js";
 import getStarkInfo from "@utils/stark/getStarkInfo.js";
-import getStgData from "@utils/layer/getStgData.js";
+import getLayerData from "@utils/layer/getLayerData.js";
 
 export {
     getEthBalance,
@@ -21,5 +21,5 @@ export {
     getStarkTx,
     getStarkBridge,
     getStarkInfo,
-    getStgData
+    getLayerData
 };
