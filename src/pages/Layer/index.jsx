@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Button, Card, Form, Input, Layout, Modal, notification, Space, Spin, Table, Tag} from "antd";
+import {Button, Card, Form, Input, Layout, Modal, notification, Popconfirm, Space, Spin, Table, Tag} from "antd";
 import {exportToExcel, getLayerData} from "@utils";
 import {
     DeleteOutlined,
@@ -25,15 +25,17 @@ const Layer = () => {
     const [isChangeApiModalVisible, setIsChangeApiModalVisible] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [apiKey, setApiKey] = useState(localStorage.getItem('l0_api_key'));
-    const rowSelection = {
-        onChange: (selectedRowKeys, selectedRows) => {
-            setSelectedKeys(selectedRowKeys);
-        },
-    };
     const exportToExcelFile = () => {
         exportToExcel(data, 'LayerZeroInfo');
     }
     const handleDeleteSelected = () => {
+        if (!selectedKeys.length) {
+            notification.error({
+                message: "错误",
+                description: "请先选择要删除的地址",
+            }, 2);
+            return;
+        }
         setData(data.filter(item => !selectedKeys.includes(item.key)));
         localStorage.setItem('l0_addresses', JSON.stringify(data.filter(item => !selectedKeys.includes(item.key))));
         setSelectedKeys([]);
@@ -180,6 +182,7 @@ const Layer = () => {
             }, 2);
         } finally {
             setIsLoading(false);
+            setSelectedKeys([]);
         }
     };
     const handleBatchOk = async () => {
@@ -255,80 +258,87 @@ const Layer = () => {
             });
         } finally {
             batchForm.resetFields();
+            setSelectedKeys([]);
         }
     }
     const [editingKey, setEditingKey] = useState(null);
     const columns = [
-            {
-                title: '备注',
-                dataIndex: 'name',
-                key: 'name',
-                align: 'center',
-                render: (text, record) => {
-                    const isEditing = record.key === editingKey;
-                    return isEditing ? (
-                        <Input
-                            placeholder="请输入备注"
-                            defaultValue={text}
-                            onPressEnter={(e) => {
-                                record.name = e.target.value;
-                                setData([...data]);
-                                localStorage.setItem('l0_addresses', JSON.stringify(data));
-                                setEditingKey(null);
-                            }}
+        {
+            title: '#',
+            key: 'index',
+            render: (text, record, index) => index + 1,
+            align: 'center',
+        },
+        {
+            title: '备注',
+            dataIndex: 'name',
+            key: 'name',
+            align: 'center',
+            render: (text, record) => {
+                const isEditing = record.key === editingKey;
+                return isEditing ? (
+                    <Input
+                        placeholder="请输入备注"
+                        defaultValue={text}
+                        onPressEnter={(e) => {
+                            record.name = e.target.value;
+                            setData([...data]);
+                            localStorage.setItem('l0_addresses', JSON.stringify(data));
+                            setEditingKey(null);
+                        }}
+                    />
+                ) : (
+                    <>
+                        <Tag color="blue">{text}</Tag>
+                        <Button
+                            shape="circle"
+                            icon={<EditOutlined/>}
+                            size={"small"}
+                            onClick={() => setEditingKey(record.key)}
                         />
-                    ) : (
-                        <>
-                            <Tag color="blue">{text}</Tag>
-                            <Button
-                                shape="circle"
-                                icon={<EditOutlined/>}
-                                size={"small"}
-                                onClick={() => setEditingKey(record.key)}
-                            />
-                        </>
-                    );
-                }
+                    </>
+                );
+            }
+        },
+        {
+            title: '地址',
+            dataIndex: 'address',
+            key: 'address',
+            align: 'center',
+        },
+        {
+            title: 'ETH',
+            dataIndex: 'eth',
+            key: 'eth',
+            render: (text, record) => {
+                return (text === null ? <Spin/> : text)
             },
-            {
-                title: '地址',
-                dataIndex: 'address',
-                key: 'address',
-                align: 'center',
+            align: 'center',
+        },
+        {
+            title: 'MATIC',
+            dataIndex: 'matic',
+            key: 'matic',
+            render: (text, record) => {
+                return (text === null ? <Spin/> : text)
             },
-            {
-                title: 'ETH',
-                dataIndex: 'eth',
-                key: 'eth',
-                render: (text, record) => {
-                    return (text === null ? <Spin/> : text)
-                },
-                align: 'center',
+            align: 'center',
+        },
+        {
+            title: 'BSC',
+            dataIndex: 'bsc',
+            key: 'bsc',
+            render: (text, record) => {
+                return (text === null ? <Spin/> : text)
             },
-            {
-                title: 'MATIC',
-                dataIndex: 'matic',
-                key: 'matic',
-                render: (text, record) => {
-                    return (text === null ? <Spin/> : text)
-                },
-                align: 'center',
-            },
-            {
-                title: 'BSC',
-                dataIndex: 'bsc',
-                key: 'bsc',
-                render: (text, record) => {
-                    return (text === null ? <Spin/> : text)
-                },
-                align: 'center',
-            },
-            {
-                title: 'ARB',
-                dataIndex: 'arb',
-                key: 'arb',
-                render: (text, record) => {
-                    return (text === null ? <Spin/> : text)
+            align: 'center',
+        },
+        {
+            title: 'ARB',
+            dataIndex: 'arb',
+            key: 'arb',
+            render: (text, record) => {
+                return (text === null ? <Spin/> : text)
                 },
                 align: 'center',
             },
@@ -383,13 +393,9 @@ const Layer = () => {
                 render: (text, record) => {
                     return (
                         <Space size="small">
-                            <Button
-                                type="primary"
-                                danger
-                                onClick={() => handleDelete(record.key)}
-                            >
-                                删除
-                            </Button>
+                            <Popconfirm title={"确定删除吗？"} onConfirm={() => handleDelete(record.key)}>
+                                <Button icon={<DeleteOutlined/>}/>
+                            </Popconfirm>
                         </Space>
                     )
                 },
@@ -419,6 +425,12 @@ const Layer = () => {
             changeApiForm.setFieldsValue(JSON.parse(storedApiKey));
         }
     }, []);
+    const rowSelection = {
+        selectedRowKeys: selectedKeys,
+        onChange: (selectedRowKeys) => {
+            setSelectedKeys(selectedRowKeys);
+        },
+    };
     return (
         <div>
             <Content>
@@ -447,7 +459,7 @@ const Layer = () => {
                         <Form.Item label="地址" name="address" rules={[{required: true}]}>
                             <Input placeholder="请输入地址"/>
                         </Form.Item>
-                        <Form.Item label="备注" name="name" rules={[{required: true}]}>
+                        <Form.Item label="备注" name="name">
                             <Input placeholder="请输入备注"/>
                         </Form.Item>
                     </Form>
@@ -512,10 +524,7 @@ const Layer = () => {
                     <Table
                         columns={columns}
                         dataSource={data}
-                        rowSelection={{
-                            type: 'checkbox',
-                            ...rowSelection,
-                        }}
+                        rowSelection={rowSelection}
                         pagination={false}
                         bordered={true}
                         size={"small"}
@@ -535,14 +544,17 @@ const Layer = () => {
                         </Button>
                         <Button type="primary" onClick={handleRefresh} loading={isLoading} size={"large"}
                                 style={{width: "15%"}}
-                                disabled={!selectedKeys.length} icon={<SyncOutlined/>}>
+                                icon={<SyncOutlined/>}>
                             刷新选中地址
                         </Button>
-                        <Button type="primary" danger onClick={handleDeleteSelected} size={"large"}
-                                style={{width: "15%"}}
-                                disabled={!selectedKeys.length} icon={<DeleteOutlined/>}>
-                            删除选中地址
-                        </Button>
+                        <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
+                                    onConfirm={handleDeleteSelected}>
+                            <Button type="primary" danger size={"large"}
+                                    style={{width: "15%"}}
+                                    icon={<DeleteOutlined/>}>
+                                删除选中地址
+                            </Button>
+                        </Popconfirm>
                         <Button type="primary" onClick={
                             () => {
                                 setIsChangeApiModalVisible(true)
