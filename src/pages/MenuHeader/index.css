@@ -1,32 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
 
 .custom-menu {
-    background-color: #f8f8f8;
+    font-family: 'Poppins', sans-serif;
 }
 
+/* 初始化菜单项样式 */
 .custom-menu .ant-menu-item {
-    color: #333333;
+    color: #333;
+    position: relative;
 }
 
-.custom-menu .ant-menu-item-selected,
-.custom-menu .ant-menu-item:hover,
-.custom-menu .ant-menu-item-active,
-.custom-menu .ant-menu-item-active:hover {
+/* 创建下划线并隐藏 */
+.custom-menu .ant-menu-item::before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: #1890ff;
+    transition: all 0.3s;
+}
+
+/* 悬停或选中时显示并展开下划线 */
+.custom-menu .ant-menu-item:hover::before,
+.custom-menu .ant-menu-item-selected::before {
+    width: 100%;
+    left: 0;
+}
+
+/* 初始化链接样式 */
+.custom-menu .ant-menu-item a {
+    color: #333;
+}
+
+/* 悬停或选中时改变链接颜色 */
+.custom-menu .ant-menu-item a:hover,
+.custom-menu .ant-menu-item-selected a {
     color: #1890ff;
-    background-color: #e6f7ff;
 }
 
-
-.custom-menu .ant-menu-item::after,
-.custom-menu .ant-menu-item-active::after,
-.custom-menu .ant-menu-item-selected::after,
-.custom-menu .ant-menu-item-active:hover::after {
-    border-bottom: none !important;
-}
-
-
-.custom-menu .ant-menu-item > a::after,
-.custom-menu .ant-menu-item-active > a::after,
-.custom-menu .ant-menu-item-selected > a::after,
-.custom-menu .ant-menu-item-active:hover > a::after {
-    border-bottom: none !important;
+.custom-menu .ant-menu-item::before {
+    height: 1px;
+    /* 其他样式 */
 }
