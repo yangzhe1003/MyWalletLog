@@ -1,14 +1,7 @@
 import axios from 'axios';
 import {getEthPrice} from "@utils";
-// export const getTokenList = async (address) => {
-//     try {
-//         const response = await axios.get(`https://zksync2-mainnet.zkscan.io/api?module=account&action=tokenlist&address=${address}`);
-//         return response.data.result;
-//     } catch (err) {
-//         console.log(err);
-//         return [];
-//     }
-// };
+import {dbConfig, initDB, update} from "@utils/indexedDB/main.js";
+
 
 const getAllTransfers = async (address) => {
     let url = `https://block-explorer-api.mainnet.zksync.io/address/${address}/transfers?limit=100&page=1`;
@@ -42,7 +35,6 @@ const assignTransferValues = async (transactions) => {
         method: 'zks_getTokenPrice',
         params: ['0x0000000000000000000000000000000000000000'],
     });
-    // const ethResponse = await getEthPrice();
     const tokensPrice = {
         USDC: 1,
         USDT: 1,
@@ -63,13 +55,6 @@ const assignTransferValues = async (transactions) => {
 export const getTransactionsList = async (address) => {
     let url = `https://block-explorer-api.mainnet.zksync.io/transactions?address=${address}&limit=100&page=1`;
     const transactions = [];
-
-    // const ethResponse = await axios.post('https://mainnet.era.zksync.io/', {
-    //     id: 42,
-    //     jsonrpc: '2.0',
-    //     method: 'zks_getTokenPrice',
-    //     params: ['0x0000000000000000000000000000000000000000'],
-    // });
     const ethResponse = await getEthPrice();
     while (true) {
         try {
@@ -116,6 +101,12 @@ export const getTransactionsList = async (address) => {
     });
 
     await assignTransferValues(transactions);
+
+    await initDB(dbConfig)
+    await update("zkTransactions", {
+        address: address,
+        data: JSON.stringify(transactions)
+    })
 
     return transactions;
 };

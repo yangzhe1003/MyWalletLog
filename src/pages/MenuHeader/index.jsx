@@ -3,10 +3,10 @@ import {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
 import {GithubOutlined, TwitterOutlined} from "@ant-design/icons";
 import './index.css'
-import {getEthPrice} from "@utils";
 import React from "react";
 import {useTranslation} from "react-i18next";
 import {Select} from 'antd';
+import initPage from "@utils/initPage.js";
 
 const {Option} = Select;
 
@@ -27,28 +27,6 @@ function LanguageSwitcher() {
 }
 
 
-const EthPrice = () => {
-    const [ethPrice, setEthPrice] = useState(null);
-
-    useEffect(() => {
-        const fetchPrice = async () => {
-            const price = await getEthPrice();
-            setEthPrice(price);
-        };
-
-        fetchPrice();
-        const interval = setInterval(fetchPrice, 10000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    if (ethPrice === null) {
-        return <div>Loading ETH Price...</div>;
-    }
-
-    return <div>ETH Price: ${ethPrice}</div>
-};
-
 const MenuHeader = () => {
     const items = [
         {
@@ -56,21 +34,25 @@ const MenuHeader = () => {
             key: 'zksync',
         },
         {
+            label: 'zkInfo',
+            key: 'zk_info',
+        },
+        {
             label: 'Stark',
             key: 'stark',
+        },
+        {
+            label: 'StarkInfo',
+            key: 'stark_info',
+        },
+        {
+            label: "Linea",
+            key: 'linea',
         },
         {
             label: 'LayerZero',
             key: 'layer',
         },
-        // {
-        //     label: 'Mirror',
-        //     key: 'mirror',
-        // },
-        // {
-        //     label: 'Deposit',
-        //     key: 'deposit',
-        // },
         {
             label: 'Coffee',
             key: 'coffee',
@@ -92,15 +74,10 @@ const MenuHeader = () => {
             key: 'github',
         },
         {
-            label: <EthPrice/>,
-            key: 'ethPrice',
-        },
-        {
             label: <LanguageSwitcher/>,
             key: 'languageSwitch',
         },
     ];
-
     const navigate = useNavigate();
     const location = useLocation();
     const [current, setCurrent] = useState(location.pathname.replace('/', '') || 'zksync');
@@ -112,7 +89,9 @@ const MenuHeader = () => {
 
         setCurrent(e.key);
     };
-
+    useEffect(() => {
+        initPage();
+    }, []);
     useEffect(() => {
         if (location.pathname.replace('/', '') === 'twitter' || location.pathname.replace('/', '') === 'github') {
             return;
