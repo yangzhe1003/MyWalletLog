@@ -1,1 +1,0 @@
-import{B as e,F as c,ab as l,al as n}from"./index-307ac27a.js";const m=async(o,i)=>{try{await e(c);const a=i.map(async s=>{const t=await l(o,s);console.log(t),t&&await n(o,s)});await Promise.all(a)}catch(a){console.log(a)}};export{m as d};
