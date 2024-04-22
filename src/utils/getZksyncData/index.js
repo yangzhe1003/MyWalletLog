@@ -9,6 +9,7 @@ import {getTxCount} from "@utils/getZksyncData/getTxCount.js";
 import {getBridge} from "@utils/getZksyncData/getBridge.js";
 import getTrustalabsData from "@utils/getZksyncData/getTrustalabsData.js";
 import {getPrtocol} from "@utils/getZksyncData/getProtocol.js";
+import isCanClaimNft from "@utils/getZksyncData/isCanClaimNft.js";
 
 export const getAllZksSyncData = async (address, isGetTrustalabsData) => {
     try {
@@ -21,8 +22,9 @@ export const getAllZksSyncData = async (address, isGetTrustalabsData) => {
         const ethBalance = await getEthBalance(address, "ethereum");
         const tx = await getTxCount(address, "ethereum");
         const bridge = getBridge(transactions, address);
-        const trustData = await getTrustalabsData(address, isGetTrustalabsData)
+        // const trustData = await getTrustalabsData(address, isGetTrustalabsData)
         await getPrtocol(transactions, address)
+        const isCanClaim = await isCanClaimNft(address)
         return {
             totalFee: fee,
             totalExchangeAmount: volume,
@@ -32,7 +34,8 @@ export const getAllZksSyncData = async (address, isGetTrustalabsData) => {
             eth_balance: ethBalance,
             eth_tx_amount: tx,
             bridge,
-            trustData,
+            // trustData,
+            isCanClaim,
             result: "success"
         };
     } catch (e) {
